@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -49,11 +50,17 @@ func main() {
 
 	app:= fiber.New()
 
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:7000",
+		AllowHeaders: "Origin,Content-Type,Accept",
+	}))
+	
 	app.Get("/api/todos", getTodos)
 	app.Post("/api/todos", createTodo)
 	app.Patch("/api/todos/:id", updateTodo)
 	app.Delete("/api/todos/:id", deleteTodo)
 
+	
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"
@@ -119,7 +126,7 @@ func updateTodo(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-
+ 
 	return c.Status(200).JSON(fiber.Map{"success": true})
 }
 func deleteTodo(c *fiber.Ctx) error {
